@@ -59,12 +59,14 @@ var _typeCodecMap = {
     "bit" : "Bit",
     "fieldtable" : "FieldTable",
     "timestamp" : "Timestamp",
-    "void" : "Void"
+    "void" : "Void",
+    "boolean" : "Boolean"
 };
 
 // 4.2.1 Formal Protocol Grammar
 var _typeIdentifierMap = {
-/*    "t" : "octet",
+   /* "t" : "octet",*/
+    /*
     "b" : /
     "B" : "octet",
     "U" :
@@ -86,7 +88,8 @@ var _typeIdentifierMap = {
     "F" : "fieldtable",
     "S" : "longstr",
     "I" : "int",
-    "V" : "void"
+    "V" : "void",
+    "t" : "boolean"
 }
 
 
@@ -94,7 +97,8 @@ var _typeNameMap = {
 
     "longstr" : "S",
     "int"  : "I",
-    "void" : "V"
+    "void" : "V",
+    "boolean" : "t"
 }
 
 /**
@@ -221,7 +225,11 @@ AmqpBuffer.prototype.getTable = function() {
 AmqpBuffer.prototype.getBit = function(offset) {
     
     return this.getUnsigned();
-}
+};
+
+AmqpBuffer.prototype.getBoolean = function() {
+	return this.getUnsigned() == 1;
+};
 
 /**
  * Packs one (of possibly several) boolean values as bits into a single 8-bit
@@ -317,6 +325,10 @@ AmqpBuffer.prototype.putTable = function(table) {
     this.putBuffer(bytes);
 
     return this;
+};
+
+AmqpBuffer.prototype.putBoolean = function(b) {
+	this.putUnsigned(b ? 1 : 0);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

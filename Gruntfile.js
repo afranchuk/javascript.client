@@ -49,7 +49,7 @@ module.exports = function(grunt) {
             amqp_0_9_1_src: {
                 cwd: 'amqp-0-9-1/src',
                 src: '**',
-                dest: 'dist/tmp/amqp-0-9-1',
+                dest: 'dist/tmp/amqp-0-9-1/src',
                 expand: true
             }
         },

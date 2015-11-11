@@ -496,14 +496,14 @@ var handshakeStartHandler = function handshakeStartHandler(connection, input, ar
          var wsFactory = connection._amqpClientFactory.getWebSocketFactory();
          if (wsFactory) {
              // Use Kaazing's WebSocket implementation.
-             socket = wsFactory.createWebSocket(args.url);
+             socket = wsFactory.createWebSocket(args.url, ["AMQPWSB10"]);
          }
     }
 
     if (socket == null) {
         // Use browser's WebSocket implementation.
     	if (typeof(WebSocket) !== "undefined") {
-            socket = new WebSocket(args.url);
+            socket = new WebSocket(args.url, "AMQPWSB10");
     	}
     	else {
     		throw new Error("Browser does not support WebSocket.");
@@ -548,7 +548,7 @@ var startingHandler = function(client, input, frame) {
 
     // TODO locale setting (probably system-wide, like Kaazing.locale)
     var locale = client._locale || "en_US";
-    var mechanism = "AMQPLAIN";
+    var mechanism = "ANONYMOUS"; // "AMQPLAIN";
 
     var credentialsOrKey = client._credentialsOrKey
 
@@ -760,7 +760,6 @@ var initChannel = function initChannel(channel, id, connection, cb) {
                          "cancelBasicAction",
 
                          "recoverBasicAction",
-                         "rejectBasicAction",
 
 
                          "selectTxAction",
@@ -772,7 +771,8 @@ var initChannel = function initChannel(channel, id, connection, cb) {
 
             // perform asychronous action and stay in the ready state
             {"inputs": ["publishBasicAction",
-                        "ackBasicAction"
+                        "ackBasicAction",
+			"rejectBasicAction"
                         ], "targetState" : "channelReady"},
 
             // start getting a single message
