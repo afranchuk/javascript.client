@@ -1152,12 +1152,7 @@
          * @memberOf ByteBuffer#
          */
         $prototype.getString = function(cs) {
-          try {
-              return cs.decode(this);
-          }
-          finally {
-              this.position = this.limit;
-          }
+			return cs.decode(this);
         };
         
         /**

@@ -142,6 +142,9 @@
                             charCode = ((byte0 & 7) << 18) | ((byte1 & 63) << 12) | ((byte2 & 63) << 6) | (byte3 & 63);
                             break;
                     }
+
+                    if (charCode == 0)
+                    	break;
     
                     if (shortBuffer) {
                         decoded.push(charCode);
@@ -149,6 +152,8 @@
                         decoded.push(String.fromCharCode(charCode));
                     }
                 }
+
+                buf.position = beginIndex + decoded.length + 1;
                 
                 if (shortBuffer) {
                     return String.fromCharCode.apply(null, decoded);
@@ -189,6 +194,7 @@
                         throw new Error("Invalid UTF-8 string");
                     }
                 }
+                array[currentPosition++] = 0;
                 buf.position = currentPosition;
                 buf.expandAt(currentPosition, currentPosition - mark);
             };
