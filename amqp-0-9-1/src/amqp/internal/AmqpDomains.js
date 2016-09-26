@@ -26,23 +26,23 @@
 var _domains = {
 
     "ClassId" : 
-        { "type" : "short",
+        { "type" : "short-int",
           "asserts" : [ ]
         }, 
     "ConsumerTag" : 
-        { "type" : "shortstr",
+        { "type" : "short-string",
           "asserts" : [ ]
         }, 
     "DeliveryTag" : 
-        { "type" : "longlong",
+        { "type" : "long-long-int",
           "asserts" : [ ]
         }, 
     "ExchangeName" : 
-        { "type" : "shortstr",
+        { "type" : "short-string",
           "asserts" : [ ]
         }, 
     "MethodId" : 
-        { "type" : "short",
+        { "type" : "short-int",
           "asserts" : [ ]
         }, 
     "NoAck" : 
@@ -58,15 +58,15 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "Path" : 
-        { "type" : "shortstr",
+        { "type" : "short-string",
           "asserts" : [ ]
         }, 
     "PeerProperties" : 
-        { "type" : "table",
+        { "type" : "field-table",
           "asserts" : [ ]
         }, 
     "QueueName" : 
-        { "type" : "shortstr",
+        { "type" : "short-string",
           "asserts" : [ ]
         }, 
     "Redelivered" : 
@@ -74,15 +74,15 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "MessageCount" : 
-        { "type" : "long",
+        { "type" : "long-int",
           "asserts" : [ ]
         }, 
     "ReplyCode" : 
-        { "type" : "short",
+        { "type" : "short-int",
           "asserts" : [ ]
         }, 
     "ReplyText" : 
-        { "type" : "shortstr",
+        { "type" : "short-string",
           "asserts" : [ ]
         }, 
     "Bit" : 
@@ -90,27 +90,27 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "Octet" : 
-        { "type" : "octet",
+        { "type" : "boolean",
           "asserts" : [ ]
         }, 
     "Short" : 
-        { "type" : "short",
+        { "type" : "short-int",
           "asserts" : [ ]
         }, 
     "Long" : 
-        { "type" : "long",
+        { "type" : "long-int",
           "asserts" : [ ]
         }, 
     "Longlong" : 
-        { "type" : "longlong",
+        { "type" : "long-long-int",
           "asserts" : [ ]
         }, 
     "Shortstr" : 
-        { "type" : "shortstr",
+        { "type" : "short-string",
           "asserts" : [ ]
         }, 
     "Longstr" : 
-        { "type" : "longstr",
+        { "type" : "long-string",
           "asserts" : [ ]
         }, 
     "Timestamp" : 
@@ -118,7 +118,7 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "Table" : 
-        { "type" : "table",
+        { "type" : "field-table",
           "asserts" : [ ]
         }
 };
