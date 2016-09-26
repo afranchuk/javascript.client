@@ -48,57 +48,66 @@ var _assert = function(condition, message) {
 };
 
 var _typeCodecMap = {
-    "octet" : "Unsigned",
-    "short" : "UnsignedShort",
-    "long" : "UnsignedInt",
-    "longlong" : "UnsignedLong",
-    "int" : "Int",
-    "table" : "Table",
-    "longstr" : "LongString",
-    "shortstr": "ShortString",
-    "bit" : "Bit",
-    "fieldtable" : "FieldTable",
+    "boolean" : "Boolean",
+    "short-int" : "Short",
+    "short-uint" : "UnsignedShort",
+    "long-int" : "Int",
+    "long-uint" : "UnsignedInt",
+    "long-long-int" : "UnsignedLong",
+    "long-long-uint" : "UnsignedLong",
+    "float" : "Double",
+    "double" : "Double",
+    "decimal-value" : "Decimal",
+    "short-string" : "ShortString",
+    "long-string" : "LongString",
+    "field-array" : "Array",
     "timestamp" : "Timestamp",
-    "void" : "Void",
-    "boolean" : "Boolean"
+    "field-table" : "Table",
+    "void" : "Void"
 };
 
 // 4.2.1 Formal Protocol Grammar
 var _typeIdentifierMap = {
-   /* "t" : "octet",*/
-    /*
-    "b" : /
-    "B" : "octet",
-    "U" :
-    "u" : "short"
-    "I" : "int",
-    "i" :
-    "L" :
-    "l" :
-    "f" :
-    "d" :
-    "D" :
-    "s" :
-    "S" : "longstr",
-    "A" :
-    "T" : "table",
-    "F" :
+    "t" : "boolean",
+    "b" : "short-short-int",
+    "B" : "short-short-uint",
+    "U" : "short-int",
+    "u" : "short-uint",
+    "I" : "long-int",
+    "i" : "long-uint",
+    "L" : "long-long-int",
+    "l" : "long-long-uint",
+    "f" : "float",
+    "d" : "double",
+    "D" : "decimal-value",
+    "s" : "short-string",
+    "S" : "long-string",
+    "A" : "field-array",
+    "T" : "timestamp",
+    "F" : "field-table",
     "V" : "void"
-*/
-    "F" : "fieldtable",
-    "S" : "longstr",
-    "I" : "int",
-    "V" : "void",
-    "t" : "boolean"
 }
 
 
 var _typeNameMap = {
-
-    "longstr" : "S",
-    "int"  : "I",
-    "void" : "V",
-    "boolean" : "t"
+    "boolean"          : "t",
+    "short-short-int"  : "b",
+    "short-short-uint" : "B",
+    "short-int"        : "U",
+    "short-uint"       : "u",
+    "long-int"         : "I",
+    "long-uint"        : "i",
+    "long-long-int"    : "L",
+    "long-long-uint"   : "l",
+    "float"            : "f",
+    "double"           : "d",
+    "decimal-value"    : "D",
+    "short-string"     : "s",
+    "long-string"      : "S",
+    "field-array"      : "A",
+    "timestamp"        : "T",
+    "field-table"      : "F",
+    "void"             : "V"
 }
 
 /**
@@ -108,11 +117,11 @@ var _typeNameMap = {
 var _encodeAuthAmqPlain = function(username, password) {
     var bytes = new AmqpBuffer();
     bytes.putShortString("LOGIN");
-        bytes.putTypeIdentifier("longstr");
+        bytes.putTypeIdentifier("long-string");
     bytes.putLongString(username);
 
     bytes.putShortString("PASSWORD");
-        bytes.putTypeIdentifier("longstr");
+        bytes.putTypeIdentifier("long-string");
     bytes.putLongString(password);
     bytes.rewind();
 
@@ -160,8 +169,20 @@ AmqpBuffer.prototype.getShortString = function() {
     return chars.join("");
 };
 
+AmqpBuffer.prototype.getDouble = function() {
+    var arr = new ArrayBuffer(8);
+    var farr = new Float64Array(arr);
+    var barr = new Uint8Array(arr);
+    var bytes = this.getBytes(8);
+    for(var i in bytes) {
+        barr[i] = bytes[i];
+    }
+    return farr[0];
+};
+
 // getVoid was added to support Void type header(header value is null).
 AmqpBuffer.prototype.getVoid = function() {
+	return null;
 };
 
 AmqpBuffer.prototype.getTypeIdentifier = function() {
@@ -219,6 +240,25 @@ AmqpBuffer.prototype.getTable = function() {
     return table;
 };
 
+AmqpBuffer.prototype.getArray = function() {
+    var arr = [];
+    var len = this.getUnsignedInt();
+    
+    // get the table sliced out;
+    var bytes = new AmqpBuffer(this.array.slice(this.position, this.position+len));
+    this.position += len;
+
+    while (bytes.remaining()) {
+    	var kv = {};
+        var ti = bytes.getTypeIdentifier();
+        kv.value = bytes["get"+_typeCodecMap[ti]]();
+        kv.type = _typeCodecMap[ti];
+        arr.push(kv);
+    }
+
+    return arr;
+};
+
 /**
  * Returns the bit at the specified offset
  */
@@ -262,6 +302,14 @@ AmqpBuffer.prototype.getUnsignedLong = function(v) {
     // word as an unsigned int
     this.getInt();
     return this.getUnsignedInt();
+};
+
+AmqpBuffer.prototype.putDouble = function(v) {
+    var arr = new ArrayBuffer(8);
+    var farr = new Float64Array(arr);
+    var barr = new Uint8Array(arr);
+    farr[0] = el;
+    return this.putBytes(barr);
 };
 
 
@@ -327,8 +375,143 @@ AmqpBuffer.prototype.putTable = function(table) {
     return this;
 };
 
+AmqpBuffer.prototype.putArray = function(array) {
+    // accept null arguments for table
+    if (!array) {
+        this.putUnsignedInt(0);
+        return this;
+    }
+
+
+    var bytes = new AmqpBuffer();
+    for (var i=0; i<array.length; i++) {
+        var entry = array[i];
+        bytes.putTypeIdentifier(entry.type);
+        bytes["put" + _typeCodecMap[entry.type]](entry.value);
+    }
+
+    bytes.rewind();
+    this.putUnsignedInt(bytes.remaining());
+    this.putBuffer(bytes);
+
+    return this;
+};
+
 AmqpBuffer.prototype.putBoolean = function(b) {
 	this.putUnsigned(b ? 1 : 0);
+};
+
+function translateObject(o) {
+	var items = [];
+	for (var k in o) {
+		var type = null;
+		var val = o[k];
+		if (typeof(o[k]) === "boolean") {
+			type = "boolean";
+		}
+		else if (typeof(o[k]) === "number") {
+			type = "double";
+		}
+		else if (typeof(o[k]) === "string") {
+			type = "long-string";
+		}
+		else if (typeof(o[k]) === "object") {
+			type = "field-table";
+			val = translateObject(o[k]);
+		}
+		else if (typeof(o[k]) === "array") {
+			type = "field-array";
+			val = translateObject(o[k]);
+		}
+
+		if (type !== null) {
+			items.push({ key : k, type : type, value : val});
+		}
+	}
+
+	return items;
+}
+
+function translateItem(item) {
+	if (item.type === "field-table") {
+		return translateBackObject(item.value);
+	}
+	else if (item.type === "field-array") {
+		return translateBackArray(item.value);
+	}
+	else return item.value;
+}
+
+function translateBackArray(items) {
+	var o = [];
+	for (var i = 0; i < items.length; i++) {
+		var item = items[i];
+		o.push(translateItem(item));
+	}
+	return o;
+}
+
+function translateBackObject(items) {
+	var o = {};
+	for (var i = 0; i < items.length; i++) {
+		var item = items[i];
+
+		o[item.key] = translateItem(item);
+	}
+	return o;
+}
+
+AmqpBuffer.prototype.putJSObject = function(o) {
+    this.putTypeIdentifier("field-table");
+
+	var items = translateObject(o);
+	return this.putTable(items);
+};
+
+AmqpBuffer.prototype.putJSArray = function(a) {
+	this.putTypeIdentifier("field-array");
+
+	var items = translateObject(o);
+	return this.putArray(items);
+};
+
+AmqpBuffer.prototype.putJS = function(o) {
+	var type = typeof(o);
+	if (type === "boolean") {
+		this.putTypeIdentifier("boolean");
+		this.putBoolean(o);
+	}
+	else if (type === "number") {
+		this.putTypeIdentifier("double");
+		this.putDouble(o);
+	}
+	else if (type === "string") {
+		this.putTypeIdentifier("long-string");
+		this.putLongString(o);
+	}
+	else if (type === "object") {
+		if (o === null) {
+			this.putTypeIdentifier("void");
+			this.putVoid();
+		}
+		else this.putJSObject(o);
+	}
+	else if (type === "array") {
+		this.putJSArray(o);
+	}
+	else throw "Unsupported type: " + type;
+};
+
+AmqpBuffer.prototype.getJS = function() {
+	var ti = this.getTypeIdentifier();
+	var r = this["get" + _typeCodecMap[ti]]();
+	if (ti === "field-table") {
+		return translateBackObject(r);
+	}
+	else if (ti === "field-array") {
+		return translateBackArray(r);
+	}
+	else return r;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
