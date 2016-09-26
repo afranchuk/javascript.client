@@ -453,10 +453,10 @@ function translateObject(o) {
 }
 
 function translateItem(item) {
-	if (item.type === "field-table") {
+	if (item.type === "Table") {
 		return translateBackObject(item.value);
 	}
-	else if (item.type === "field-array") {
+	else if (item.type === "Array") {
 		return translateBackArray(item.value);
 	}
 	else return item.value;
