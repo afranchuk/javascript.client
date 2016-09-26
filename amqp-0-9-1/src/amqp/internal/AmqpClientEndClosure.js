@@ -21,6 +21,7 @@
 
 $module.AmqpClient  = AmqpClient;
 $module.AmqpChannel = AmqpChannel;
+$module.AmqpBuffer = AmqpBuffer;
 
 })();
 
