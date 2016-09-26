@@ -62,7 +62,7 @@ AmqpArguments.prototype = new Array();
      * @memberOf AmqpArguments#
      */
     $prototype.addLongString = function(key, value) {
-        _add(this, key, value, "longstr");
+        _add(this, key, value, "long-string");
         return this;
     }
 
@@ -81,7 +81,7 @@ AmqpArguments.prototype = new Array();
      * @memberOf AmqpArguments#
      */
     $prototype.addInteger = function(key, value) {
-        _add(this, key, value, "int");
+        _add(this, key, value, "long-int");
         return this;
     }
 

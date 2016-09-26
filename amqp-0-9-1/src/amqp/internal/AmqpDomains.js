@@ -34,7 +34,7 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "DeliveryTag" : 
-        { "type" : "long-long-int",
+        { "type" : "long-long-uint",
           "asserts" : [ ]
         }, 
     "ExchangeName" : 
@@ -74,7 +74,7 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "MessageCount" : 
-        { "type" : "long-int",
+        { "type" : "long-uint",
           "asserts" : [ ]
         }, 
     "ReplyCode" : 
@@ -98,11 +98,11 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "Long" : 
-        { "type" : "long-int",
+        { "type" : "long-uint",
           "asserts" : [ ]
         }, 
     "Longlong" : 
-        { "type" : "long-long-int",
+        { "type" : "long-long-uint",
           "asserts" : [ ]
         }, 
     "Shortstr" : 
