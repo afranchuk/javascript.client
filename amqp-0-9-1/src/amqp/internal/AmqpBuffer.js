@@ -173,24 +173,24 @@ AmqpBuffer.prototype.getShortString = function() {
 
 AmqpBuffer.prototype.getDouble = function() {
     var arr = new ArrayBuffer(8);
-    var farr = new Float64Array(arr);
+    var farr = new DataView(arr);
     var barr = new Uint8Array(arr);
     var bytes = this.getBytes(8);
     for(var i in bytes) {
         barr[i] = bytes[i];
     }
-    return farr[0];
+    return farr.getFloat64(0, false);
 };
 
 AmqpBuffer.prototype.getFloat = function() {
     var arr = new ArrayBuffer(4);
-    var farr = new Float32Array(arr);
+    var farr = new DataView(arr);
     var barr = new Uint8Array(arr);
     var bytes = this.getBytes(4);
     for(var i in bytes) {
         barr[i] = bytes[i];
     }
-    return farr[0];
+    return farr.getFloat32(0, false);
 };
 
 // getVoid was added to support Void type header(header value is null).
@@ -319,17 +319,17 @@ AmqpBuffer.prototype.getUnsignedLong = function(v) {
 
 AmqpBuffer.prototype.putDouble = function(v) {
     var arr = new ArrayBuffer(8);
-    var farr = new Float64Array(arr);
+    var farr = new DataView(arr);
     var barr = new Uint8Array(arr);
-    farr[0] = el;
+    farr.setFloat64(0, el, false);
     return this.putBytes(barr);
 };
 
 AmqpBuffer.prototype.putFloat = function(v) {
     var arr = new ArrayBuffer(4);
-    var farr = new Float32Array(arr);
+    var farr = new DataView(arr);
     var barr = new Uint8Array(arr);
-    farr[0] = el;
+    farr.setFloat32(0, el, false);
     return this.putBytes(barr);
 };
 
