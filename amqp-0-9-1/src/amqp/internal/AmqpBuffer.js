@@ -48,6 +48,8 @@ var _assert = function(condition, message) {
 };
 
 var _typeCodecMap = {
+	"bit" : "Bit",
+	"octet" : "Unsigned",
     "boolean" : "Boolean",
     "short-int" : "Short",
     "short-uint" : "UnsignedShort",

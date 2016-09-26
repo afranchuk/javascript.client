@@ -90,7 +90,7 @@ var _domains = {
           "asserts" : [ ]
         }, 
     "Octet" : 
-        { "type" : "boolean",
+        { "type" : "octet",
           "asserts" : [ ]
         }, 
     "Short" : 
