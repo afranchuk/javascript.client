@@ -55,7 +55,7 @@ var _typeCodecMap = {
     "long-uint" : "UnsignedInt",
     "long-long-int" : "UnsignedLong",
     "long-long-uint" : "UnsignedLong",
-    "float" : "Double",
+    "float" : "Float",
     "double" : "Double",
     "decimal-value" : "Decimal",
     "short-string" : "ShortString",
@@ -174,6 +174,17 @@ AmqpBuffer.prototype.getDouble = function() {
     var farr = new Float64Array(arr);
     var barr = new Uint8Array(arr);
     var bytes = this.getBytes(8);
+    for(var i in bytes) {
+        barr[i] = bytes[i];
+    }
+    return farr[0];
+};
+
+AmqpBuffer.prototype.getFloat = function() {
+    var arr = new ArrayBuffer(4);
+    var farr = new Float32Array(arr);
+    var barr = new Uint8Array(arr);
+    var bytes = this.getBytes(4);
     for(var i in bytes) {
         barr[i] = bytes[i];
     }
@@ -312,6 +323,13 @@ AmqpBuffer.prototype.putDouble = function(v) {
     return this.putBytes(barr);
 };
 
+AmqpBuffer.prototype.putFloat = function(v) {
+    var arr = new ArrayBuffer(4);
+    var farr = new Float32Array(arr);
+    var barr = new Uint8Array(arr);
+    farr[0] = el;
+    return this.putBytes(barr);
+};
 
 AmqpBuffer.prototype.putTimestamp = function(v) {
     var ts = v.getTime(); 
